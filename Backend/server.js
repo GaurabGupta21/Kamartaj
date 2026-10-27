@@ -1,8 +1,13 @@
-
 const dns = require("node:dns");
+const path = require("node:path");
+const fs = require("node:fs");
 
-// Fix MongoDB Atlas DNS/SRV resolution issue
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
+// Fix MongoDB Atlas DNS/SRV resolution issue safely
+try {
+  dns.setServers(["1.1.1.1", "8.8.8.8"]);
+} catch (dnsErr) {
+  console.warn("Custom DNS servers could not be set:", dnsErr.message);
+}
 
 require("dotenv").config();
 
@@ -20,14 +25,32 @@ const analyticsRoutes = require("./src/routes/analyticsRoutes");
 
 const app = express();
 
-// CORS
+// Flexible CORS for production and development
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:5173"
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (
+      allowedOrigins.includes(origin) ||
+      /\.vercel\.app$/.test(origin) ||
+      /\.onrender\.com$/.test(origin) ||
+      /\.netlify\.app$/.test(origin)
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
+  credentials: true
 }));
 
 // Health check
 app.get("/api/health", (req, res) => {
-  res.json({ message: "API is running" });
+  res.json({ status: "healthy", message: "Kamar-Taj Refectory API is running" });
 });
 
 // Razorpay webhook: raw body required for signature verification
@@ -51,6 +74,16 @@ app.use("/api/admin/analytics", analyticsRoutes);
 
 // Payment routes
 app.use("/api/payments", paymentRoutes);
+
+// Serve static frontend build if present (for unified single-service deployment)
+const clientDistPath = path.join(__dirname, "../client/dist");
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api")) return next();
+    res.sendFile(path.join(clientDistPath, "index.html"));
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 

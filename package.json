@@ -1,0 +1,13 @@
+{
+  "name": "kamartaj-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Kamar-Taj Refectory Management System",
+  "scripts": {
+    "install:all": "npm --prefix Backend install && npm --prefix client install",
+    "build": "npm --prefix client install && npm --prefix client run build && npm --prefix Backend install",
+    "start": "npm --prefix Backend start",
+    "server": "npm --prefix Backend run dev",
+    "client": "npm --prefix client run dev"
+  }
+}
