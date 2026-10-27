@@ -11,7 +11,7 @@ const {
 } = require("../controllers/menuController");
 
 
-const { protect, authorizeRoles } =
+const { protect, allowRoles } =
   require("../middleware/authMiddleware");
 
 router.get("/today", protect, getTodayMenus);
@@ -21,21 +21,21 @@ router.get("/:id", protect, getMenuById);
 router.post(
   "/",
   protect,
-  authorizeRoles("staff"),
+  allowRoles("staff"),
   createMenu
 );
 
 router.put(
   "/:id",
   protect,
-  authorizeRoles("staff"),
+  allowRoles("staff"),
   updateMenu
 );
 
 router.delete(
   "/:id",
   protect,
-  authorizeRoles("staff"),
+  allowRoles("staff"),
   deleteMenu
 );
 

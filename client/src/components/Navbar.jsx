@@ -1,63 +1,85 @@
+import { Link, useNavigate } from 'react-router-dom';
+import { getStoredUser } from '../api/api';
 
-function Navbar() {
-  return (
-    <nav className="sticky top-0 z-50 border-b border-green-900/20 bg-white/95 shadow-sm backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
+function Navbar({ onToggleSidebar, title, isDashboard = false }) {
+  const navigate = useNavigate();
+  const user = getStoredUser();
 
-        {/* Brand */}
-        <a href="/" className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center">
-            <img
-                src="/newlogo.svg"
-                alt="Kamar-Taj logo"
-                className="h-full w-full object-contain"
-            />
-          </div>
+  const getDashboardPath = () => {
+    if (!user) return '/login';
+    if (user.role === 'admin') return '/admin';
+    if (user.role === 'staff') return '/worker';
+    return '/student';
+  };
 
-          <div>
-            <h1 className="font-['Dancing_Script'] text-3xl font-bold tracking-tight text-green-950">
-            Kamar-Taj
-            </h1>
-            <p className="text-xs font-medium tracking-widest text-green-700">
-              REFECTORY
-            </p>
-          </div>
-        </a>
-
-        {/* Navigation links */}
-        <div className="hidden items-center gap-8 md:flex">
-          <a
-            href="/home"
-            className="font-semibold text-green-800 transition-colors hover:text-green-600"
+  if (isDashboard) {
+    return (
+      <header className="top-navbar">
+        <div className="top-nav-left">
+          <button
+            type="button"
+            className="mobile-menu-btn"
+            onClick={onToggleSidebar}
+            aria-label="Toggle Navigation"
           >
-            Home
-          </a>
-
-          <a
-            href="/menu"
-            className="font-medium text-gray-600 transition-colors hover:text-green-700"
-          >
-            Today's Menu
-          </a>
-
-          <a
-            href="/about"
-            className="font-medium text-gray-600 transition-colors hover:text-green-700"
-          >
-            About
-          </a>
+            ☰
+          </button>
+          <h2 className="top-nav-title">{title || 'Dashboard'}</h2>
         </div>
 
-        {/* Login button */}
-        <button
-          type="button"
-          className="rounded-xl bg-green-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-green-800 hover:shadow-md active:scale-95"
-        >
-           Login
-        </button>
+        <div className="top-nav-right">
+          <span className="badge badge-success">
+            ● System Active
+          </span>
+          <span className="user-name" style={{ fontSize: '13px' }}>
+            {user?.name} ({user?.role === 'staff' ? 'Mess Worker' : user?.role})
+          </span>
+        </div>
+      </header>
+    );
+  }
 
+  // Public Landing Navbar
+  return (
+    <header className="top-navbar" style={{ padding: '0 32px' }}>
+      <div className="top-nav-left">
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="brand-icon" style={{ width: '36px', height: '36px', fontSize: '18px' }}>
+            🏛️
+          </div>
+          <div>
+            <span className="brand-title" style={{ fontSize: '22px' }}>Kamar-Taj</span>
+            <span className="brand-sub" style={{ display: 'block', fontSize: '9px' }}>Refectory</span>
+          </div>
+        </Link>
       </div>
-    </nav>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <Link to="/" style={{ fontSize: '14px', fontWeight: '500', color: 'var(--text-body)' }}>
+          Home
+        </Link>
+        <Link to="/login" style={{ fontSize: '14px', fontWeight: '500', color: 'var(--text-body)' }}>
+          Today's Menu
+        </Link>
+        {user ? (
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={() => navigate(getDashboardPath())}
+          >
+            Go to Dashboard →
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={() => navigate('/login')}
+          >
+            Sign In
+          </button>
+        )}
+      </div>
+    </header>
   );
 }
 

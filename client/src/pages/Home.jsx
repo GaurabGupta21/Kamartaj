@@ -1,83 +1,142 @@
-import Navbar from "../components/Navbar";
+import { Link, useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
+import { getStoredUser } from '../api/api';
+
 function Home() {
-    return(
-        <div className="min-h-screen bg-green-50">
-        <Navbar />
+  const navigate = useNavigate();
+  const user = getStoredUser();
 
-        <main className="relative mx-auto max-w-7xl px-6 py-12 lg:py-12">
-            <img
-            src="/college-outline.svg"
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 h-[100%] w-[100%] object-cover object-center opacity-[0.12]"
-            />
-            <div className="max-w-3xl">
-            <p className="mb-4 font-semibold uppercase tracking-widest text-green-700">
-                Smart Mess Management
-            </p>
+  const handleGetStarted = () => {
+    if (!user) {
+      navigate('/login');
+    } else if (user.role === 'admin') {
+      navigate('/admin');
+    } else if (user.role === 'staff') {
+      navigate('/worker');
+    } else {
+      navigate('/student');
+    }
+  };
 
-            <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-green-950 sm:text-6xl">
-                Good food.
-                <br />
-                Better campus living.
-            </h1>
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-main)' }}>
+      <Navbar />
 
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-gray-600">
-                Discover today's mess menu, reserve your meals, and enjoy a
-                smarter, simpler dining experience on campus.
-            </p>
+      <main style={{ flex: 1, padding: '48px 24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+        {/* Hero Section */}
+        <div style={{ textAlign: 'center', padding: '40px 16px 56px 16px' }}>
+          <span className="badge badge-success" style={{ marginBottom: '16px', fontSize: '13px', padding: '6px 14px' }}>
+            Smart Campus Mess & Food-Waste Analytics
+          </span>
 
-            <div className="mt-8 flex flex-wrap gap-4">
-                <a
-                href="/menu"
-                className="rounded-xl bg-green-900 px-6 py-3 font-semibold text-white shadow-md transition hover:bg-green-800"
-                >
-                Explore Today's Menu →
-                </a>
+          <h1 style={{ fontSize: '46px', fontWeight: '900', color: 'var(--primary-dark)', lineHeight: '1.15', letterSpacing: '-0.03em', maxWidth: '850px', margin: '0 auto' }}>
+            The Kamar-Taj Refectory
+          </h1>
 
-                <a
-                href="#how-it-works"
-                className="rounded-xl border border-green-900/20 bg-white px-6 py-3 font-semibold text-green-950 transition hover:bg-green-100"
-                >
-                How It Works
-                </a>
-            </div>
-            </div>
+          <p style={{ fontSize: '20px', color: 'var(--text-body)', marginTop: '16px', maxWidth: '680px', margin: '16px auto 0 auto', lineHeight: '1.5' }}>
+            Nutritious campus meals, zero waste. Reserve your daily meals in advance, redeem with secure cryptographic QR passes, and empower data-driven food conservation.
+          </p>
 
-            <div
-            id="how-it-works"
-            className="mt-12 grid gap-5 sm:grid-cols-3"
+          <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', marginTop: '32px', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              className="btn btn-primary btn-lg"
+              onClick={handleGetStarted}
             >
-            <div className="rounded-2xl border border-green-900/10 bg-white p-6 shadow-sm">
-                <h2 className="text-xl font-bold text-green-950">
-                Today's Menu
-                </h2>
-                <p className="mt-2 leading-6 text-gray-600">
-                Check what's cooking for breakfast, lunch, and dinner.
-                </p>
-            </div>
-
-            <div className="rounded-2xl border border-green-900/10 bg-white p-6 shadow-sm">
-                <h2 className="text-xl font-bold text-green-950">
-                Easy Reservations
-                </h2>
-                <p className="mt-2 leading-6 text-gray-600">
-                Reserve your meal in advance and avoid unnecessary food preparation.
-                </p>
-            </div>
-
-            <div className="rounded-2xl border border-green-900/10 bg-white p-6 shadow-sm">
-                <h2 className="text-xl font-bold text-green-950">
-                QR Meal Pass
-                </h2>
-                <p className="mt-2 leading-6 text-gray-600">
-                Use a QR pass to make meal collection easier and more organized.
-                </p>
-            </div>
-            </div>
-        </main>
+              {user ? 'Enter Your Dashboard →' : 'Sign In to Mess Portal →'}
+            </button>
+            <Link to="/login" className="btn btn-secondary btn-lg">
+              Explore Today's Menu
+            </Link>
+          </div>
         </div>
-    )
+
+        {/* Feature Cards Grid */}
+        <div className="grid grid-cols-3" style={{ marginBottom: '60px' }}>
+          <div className="card">
+            <div style={{ fontSize: '32px', marginBottom: '12px' }}>🍲</div>
+            <h3 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-main)', marginBottom: '8px' }}>
+              Daily Menus & Advance Booking
+            </h3>
+            <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+              Check breakfast, lunch, and dinner options each morning. Advance meal bookings allow refectory chefs to prepare exact portions rather than overproducing.
+            </p>
+          </div>
+
+          <div className="card">
+            <div style={{ fontSize: '32px', marginBottom: '12px' }}>📱</div>
+            <h3 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-main)', marginBottom: '8px' }}>
+              Secure QR Meal Passes
+            </h3>
+            <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+              Verified bookings generate single-use cryptographic QR tokens. Mess workers scan passes instantly at serving counters, eliminating queues and duplicate claims.
+            </p>
+          </div>
+
+          <div className="card">
+            <div style={{ fontSize: '32px', marginBottom: '12px' }}>📊</div>
+            <h3 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-main)', marginBottom: '8px' }}>
+              Intelligent Waste Analytics
+            </h3>
+            <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+              Detailed tracking of food prepared, served, and leftover (in kg). Executive charts track waste percentages and demand patterns to drive sustainable campus dining.
+            </p>
+          </div>
+        </div>
+
+        {/* Roles section */}
+        <div className="card" style={{ padding: '36px', backgroundColor: '#fff', border: '1px solid var(--primary-border)' }}>
+          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--text-main)' }}>
+              Tailored Portals for the Entire Campus Community
+            </h2>
+            <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '6px' }}>
+              Each role enjoys dedicated workflows connected to real backend services.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3">
+            <div style={{ padding: '20px', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)' }}>
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>🎓</div>
+              <h4 style={{ fontWeight: '700', color: 'var(--primary-dark)', marginBottom: '6px' }}>
+                Students
+              </h4>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                View today's dishes, reserve meal slots, cancel unneeded reservations, and display official QR passes on your mobile phone.
+              </p>
+            </div>
+
+            <div style={{ padding: '20px', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)' }}>
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>🍽️</div>
+              <h4 style={{ fontWeight: '700', color: 'var(--primary-dark)', marginBottom: '6px' }}>
+                Mess Workers & Staff
+              </h4>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                Publish daily menus, update seat capacity, scan student QR passes with webcam, and log physical kitchen preparation/leftover weights.
+              </p>
+            </div>
+
+            <div style={{ padding: '20px', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)' }}>
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>🛡️</div>
+              <h4 style={{ fontWeight: '700', color: 'var(--primary-dark)', marginBottom: '6px' }}>
+                Administration
+              </h4>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                Review real-time revenue trends, redemption ratios, capacity occupancy, and food waste reduction metrics with interactive Recharts.
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer style={{ borderTop: '1px solid var(--border)', backgroundColor: '#fff', padding: '24px', textAlign: 'center', fontSize: '13px', color: 'var(--text-muted)' }}>
+        <p>
+          The Kamar-Taj Refectory — Secure Smart Mess Management & Food-Waste Analytics
+        </p>
+      </footer>
+    </div>
+  );
 }
 
 export default Home;

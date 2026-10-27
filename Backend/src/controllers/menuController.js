@@ -1,4 +1,5 @@
 
+const mongoose = require("mongoose");
 const Menu = require("../models/menu");
 
 // POST: Create a menu (staff only)
@@ -43,7 +44,7 @@ exports.createMenu = async (req, res) => {
       items: items.map(item => item.trim()),
       price,
       capacity,
-      createdBy: req.user._id
+      createdBy: req.user.id
     });
 
     res.status(201).json({
@@ -92,6 +93,10 @@ exports.getTodayMenus = async (req, res) => {
 // GET: One menu
 exports.getMenuById = async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid menu ID" });
+    }
+
     const menu = await Menu.findById(req.params.id);
 
     if (!menu)

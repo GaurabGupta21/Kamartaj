@@ -40,7 +40,7 @@ exports.createBooking = async (req, res) => {
 
     try { //save the booking
       const booking = await Booking.create({
-        student: req.user._id,
+        student: req.user.id,
         menu: menuId,
         quantity,
         amount: updated.price * quantity
@@ -61,9 +61,10 @@ exports.createBooking = async (req, res) => {
 };
 
 // GET: My bookings
+//yishme book huwa he ki nahi findout hoga
 exports.getMyBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ student: req.user._id })
+    const bookings = await Booking.find({ student: req.user.id })
       .populate("menu", "mealType date items price")
       .sort({ createdAt: -1 });
 
@@ -73,7 +74,8 @@ exports.getMyBookings = async (req, res) => {
   }
 };
 
-// GET: One booking
+// GET: One booking 
+//booked user apna profile me booking details dekh sakta hai
 exports.getBookingById = async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id))
@@ -81,7 +83,7 @@ exports.getBookingById = async (req, res) => {
 
     const booking = await Booking.findOne({
       _id: req.params.id,
-      student: req.user._id
+      student: req.user.id
     }).populate("menu", "mealType date items price");
 
     if (!booking)
@@ -93,7 +95,8 @@ exports.getBookingById = async (req, res) => {
   }
 };
 
-// GET: Booking status
+// GET: Booking status 
+//it can check the studemt payment or booking status
 exports.getBookingStatus = async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id))
@@ -101,7 +104,7 @@ exports.getBookingStatus = async (req, res) => {
 
     const booking = await Booking.findOne({
       _id: req.params.id,
-      student: req.user._id
+      student: req.user.id
     }).select("paymentStatus bookingStatus");
 
     if (!booking)
@@ -113,7 +116,7 @@ exports.getBookingStatus = async (req, res) => {
   }
 };
 
-// POST: Cancel pending booking
+// POST: Cancel pending booking seats and release reserved seats
 exports.cancelBooking = async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id))
@@ -122,7 +125,7 @@ exports.cancelBooking = async (req, res) => {
     const booking = await Booking.findOneAndUpdate(
       {
         _id: req.params.id,
-        student: req.user._id,
+        student: req.user.id,
         bookingStatus: "pending_payment",
         paymentStatus: "pending"
       },
